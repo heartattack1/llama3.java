@@ -1,6 +1,6 @@
-# Llama3.java
+# Llama3
 
-Practical [Llama 3](https://github.com/meta-llama/llama3), [3.1](https://llama.meta.com/docs/model-cards-and-prompt-formats/llama3_1) and [3.2](https://ai.meta.com/blog/llama-3-2-connect-2024-vision-edge-mobile-devices/) inference implemented in a single Java file.
+Practical [Llama 3](https://github.com/meta-llama/llama3), [3.1](https://llama.meta.com/docs/model-cards-and-prompt-formats/llama3_1) and [3.2](https://ai.meta.com/blog/llama-3-2-connect-2024-vision-edge-mobile-devices/) inference implemented in Java with a modular, testable structure.
 
 <p align="center">
   <img width="700" src="https://github.com/user-attachments/assets/69bbf681-ae84-4a46-bcd6-746dbd421a6e">
@@ -13,7 +13,7 @@ Besides the educational value, this project will be used to test and tune compil
 
 ## Features
 
- - Single file, no dependencies
+ - Modular package structure with Maven-managed dependencies
  - [GGUF format](https://github.com/ggerganov/ggml/blob/master/docs/gguf.md) parser
  - Llama 3 tokenizer based on [minbpe](https://github.com/karpathy/minbpe)
  - Llama 3 inference with Grouped-Query Attention
@@ -78,33 +78,28 @@ with the `llama-quantize` utility from [llama.cpp](https://github.com/ggerganov/
 
 Java 21+ is required, in particular the [`MemorySegment` mmap-ing feature](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/channels/FileChannel.html#map(java.nio.channels.FileChannel.MapMode,long,long,java.lang.foreign.Arena)).
 
-[`jbang`](https://www.jbang.dev/) is a perfect fit for this use case, just:
-```
-jbang Llama3.java --help
-```
-Or execute directly, also via [`jbang`](https://www.jbang.dev/):
-```bash 
-chmod +x Llama3.java
-./Llama3.java --help
-```
-
-## Run from source
+### Maven build
 
 ```bash
-java --enable-preview --source 21 --add-modules jdk.incubator.vector Llama3.java -i --model Meta-Llama-3-8B-Instruct-Q4_0.gguf
+mvn package
 ```
 
-#### Optional: Makefile + manually build and run
+Run the resulting JAR:
 
-A simple [Makefile](./Makefile) is provided, run `make` to produce `llama3.jar` or manually:
 ```bash
-javac -g --enable-preview -source 21 --add-modules jdk.incubator.vector -d target/classes Llama3.java
-jar -cvfe llama3.jar com.llama4j.Llama3 LICENSE -C target/classes .
+java --add-modules jdk.incubator.vector -jar target/llama3-1.0.0-SNAPSHOT.jar --help
 ```
 
-Run the resulting `llama3.jar` as follows: 
+### Run from source
+
 ```bash
-java --enable-preview --add-modules jdk.incubator.vector -jar llama3.jar --help
+mvn -q exec:java -Dexec.mainClass=com.llama4j.cli.LlamaCli -Dexec.args="--help"
+```
+
+### Tests
+
+```bash
+mvn test
 ```
 
 ### GraalVM Native Image
@@ -128,7 +123,7 @@ Run as Native Image:
 
 ### AOT model preloading
 
-`Llama3.java` supports AOT model preloading, enabling **0-overhead, instant inference, with minimal TTFT (time-to-first-token)**.
+This project supports AOT model preloading, enabling **0-overhead, instant inference, with minimal TTFT (time-to-first-token)**.
 
 To AOT pre-load a GGUF model:
 ```bash
@@ -157,7 +152,7 @@ Executed as follows:
 ./llama-bench -m Llama-3.2-1B-Instruct-Q4_0.gguf -p 0 -n 128
 ```
 
-#### Llama3.java
+#### Llama3 (Java)
 
 ```bash
 taskset -c 0-15 ./llama3 \
