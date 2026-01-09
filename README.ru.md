@@ -1,13 +1,13 @@
 # Llama3
 
-## Requirements
+## Требования
 
-- Java 25+ (uses `MemorySegment` mmap).
+- Java 25+ (используется `MemorySegment` mmap).
 - Maven 3.x
 
-## Download a model (GGUF)
+## Скачайте модель (GGUF)
 
-Download a `Q4_0` or `Q8_0` GGUF file, for example:
+Скачайте файл GGUF в квантизации `Q4_0` или `Q8_0`, например:
 
 ```bash
 # Llama 3.2 (3B)
@@ -17,13 +17,13 @@ curl -L -O https://huggingface.co/mukel/Llama-3.2-3B-Instruct-GGUF/resolve/main/
 curl -L -O https://huggingface.co/mukel/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q8_0.gguf
 ```
 
-## Build
+## Сборка
 
 ```bash
 mvn package
 ```
 
-## Run
+## Запуск
 
 ```bash
 java --add-modules jdk.incubator.vector \
@@ -32,7 +32,7 @@ java --add-modules jdk.incubator.vector \
   --chat
 ```
 
-## Run from source
+## Запуск из исходников
 
 ```bash
 mvn -q exec:java \
