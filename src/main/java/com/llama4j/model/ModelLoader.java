@@ -10,6 +10,8 @@ import com.llama4j.tensor.Q4_0FloatTensor;
 import com.llama4j.tensor.Q8_0FloatTensor;
 import com.llama4j.tensor.RoPE;
 import com.llama4j.tokenizer.Tokenizer;
+import com.llama4j.tokenizer.TokenizerConfig;
+import com.llama4j.tokenizer.TokenizerFactory;
 import com.llama4j.tokenizer.Vocabulary;
 import com.llama4j.util.Pair;
 import com.llama4j.util.Timer;
@@ -32,6 +34,7 @@ import java.util.stream.IntStream;
  */
 public final class ModelLoader {
     private static final String TOKENIZER_LLAMA_3_MODEL = "gpt2";
+    private static final String MODEL_NAME = "llama";
 
     private static final String LLAMA_3_PATTERN =
             "(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\\r\\n\\p{L}\\p{N}]?\\p{L}+|\\p{N}{1,3}| ?[^\\s\\p{L}\\p{N}]+[\\r\\n]*|\\s*[\\r\\n]+|\\s+(?!\\S)|\\s+";
@@ -171,7 +174,13 @@ public final class ModelLoader {
                 .boxed()
                 .collect(Collectors.toMap(i -> specialTokensList.get(i), i -> baseTokens + i));
 
-        return new Tokenizer(vocabulary, merges, LLAMA_3_PATTERN, specialTokens);
+        TokenizerConfig tokenizerConfig = TokenizerConfig.builder()
+                .vocabulary(vocabulary)
+                .merges(merges)
+                .regexPattern(LLAMA_3_PATTERN)
+                .specialTokens(specialTokens)
+                .build();
+        return TokenizerFactory.createTokenizer(MODEL_NAME, tokenizerConfig);
     }
 
     /**

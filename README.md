@@ -5,6 +5,30 @@
 - Java 25+ (uses `MemorySegment` mmap).
 - Maven 3.x
 
+## Architecture overview
+
+This project exposes a flexible, extensible model API:
+
+- `Model` interface: `com.llama4j.model.Model`
+- Model factory: `com.llama4j.model.ModelFactory`
+- Tokenizer factory: `com.llama4j.tokenizer.TokenizerFactory`
+- Configuration base type: `com.llama4j.config.ModelConfiguration`
+
+Each model implementation supplies its own configuration class, tokenizer provider, and a service provider entry in
+`src/main/resources/META-INF/services`.
+
+## Adding a new model
+
+1. Create a new `Model` implementation (for example `com.llama4j.model.MyModel`) and a configuration class that extends
+   `com.llama4j.config.ModelConfiguration`.
+2. Add a `ModelProvider` implementation that returns your model.
+3. Implement a `TokenizerProvider` and register it in
+   `src/main/resources/META-INF/services/com.llama4j.tokenizer.TokenizerProvider`.
+4. Register your `ModelProvider` in
+   `src/main/resources/META-INF/services/com.llama4j.model.ModelProvider`.
+
+No changes are needed in the shared factories once the providers are registered.
+
 ## Download a model (GGUF)
 
 Download a `Q4_0` or `Q8_0` GGUF file, for example:
@@ -21,6 +45,12 @@ curl -L -O https://huggingface.co/mukel/Llama-3.2-1B-Instruct-GGUF/resolve/main/
 
 ```bash
 mvn package
+```
+
+## Tests
+
+```bash
+mvn test
 ```
 
 ## Run
