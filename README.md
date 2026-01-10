@@ -62,6 +62,94 @@ java --add-modules jdk.incubator.vector \
   --chat
 ```
 
+## Examples
+
+### Single-shot instruct prompt
+
+```bash
+java --add-modules jdk.incubator.vector \
+  -jar target/llama3-1.0.0-SNAPSHOT.jar \
+  --model /path/to/model.gguf \
+  --prompt "Explain Java memory segments in one paragraph."
+```
+
+### Chat mode with a system prompt
+
+```bash
+java --add-modules jdk.incubator.vector \
+  -jar target/llama3-1.0.0-SNAPSHOT.jar \
+  --model /path/to/model.gguf \
+  --chat \
+  --system-prompt "You are a helpful assistant that answers in Russian."
+```
+
+### Deterministic sampling with custom limits
+
+```bash
+java --add-modules jdk.incubator.vector \
+  -jar target/llama3-1.0.0-SNAPSHOT.jar \
+  --model /path/to/model.gguf \
+  --prompt "List three JVM tuning tips." \
+  --seed 42 \
+  --temperature 0.2 \
+  --top-p 0.9 \
+  --max-tokens 200
+```
+
+## Use in another project
+
+First, build and install the library to your local Maven repository:
+
+```bash
+mvn install
+```
+
+Then add it as a dependency in your project:
+
+```xml
+<dependency>
+  <groupId>com.llama4j</groupId>
+  <artifactId>llama3</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+Minimal Java usage example:
+
+```java
+import com.llama4j.model.Llama;
+import com.llama4j.model.ModelLoader;
+import com.llama4j.sampling.Sampler;
+import com.llama4j.tokenizer.ChatFormat;
+
+import java.nio.file.Path;
+import java.util.List;
+
+Path modelPath = Path.of("/path/to/model.gguf");
+Llama model = ModelLoader.loadModel(modelPath, 4096, true);
+Llama.State state = model.createNewState(16);
+
+ChatFormat chatFormat = new ChatFormat(model.tokenizer());
+List<Integer> promptTokens = chatFormat.encodeMessage(
+    new ChatFormat.Message(ChatFormat.Role.USER, "Explain GGUF files in one sentence.")
+);
+
+List<Integer> responseTokens = Llama.generateTokens(
+    model,
+    state,
+    0,
+    promptTokens,
+    chatFormat.getStopTokens(),
+    512,
+    Sampler.ARGMAX,
+    false,
+    null
+);
+
+String response = model.tokenizer().decode(responseTokens);
+System.out.println(response);
+```
+
 ## Run from source
 
 ```bash
