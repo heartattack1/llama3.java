@@ -1,5 +1,6 @@
 package com.llama4j.model;
 
+import com.llama4j.config.ModelConfiguration;
 import com.llama4j.sampling.Sampler;
 import com.llama4j.tensor.ArrayFloatTensor;
 import com.llama4j.tensor.FloatTensor;
@@ -38,7 +39,7 @@ public record Llama(Configuration configuration, Tokenizer tokenizer, Weights we
     /**
      * Model configuration parameters.
      */
-    public static final class Configuration {
+    public static final class Configuration extends ModelConfiguration {
         /** transformer dimension */
         public final int dim;
         /** FFN hidden dimension */
@@ -85,6 +86,21 @@ public record Llama(Configuration configuration, Tokenizer tokenizer, Weights we
             this.rmsNormEps = rmsNormEps;
             this.ropeTheta = ropeTheta;
             this.headSize = dim / numberOfHeads;
+        }
+
+        @Override
+        public String modelName() {
+            return "llama";
+        }
+
+        @Override
+        public int vocabularySize() {
+            return vocabularySize;
+        }
+
+        @Override
+        public int contextLength() {
+            return contextLength;
         }
 
         /**
